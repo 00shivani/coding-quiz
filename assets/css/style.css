@@ -78,12 +78,16 @@ body {
     transition: all 0.3s;
 }
 
-.button:hover {
+.button:hover:not([disabled]) {
     background: var(--hoverBlue);
     color: white;
 }
 
-.button:active {
+.button:disabled {
+    cursor:default;
+}
+
+.button:active:not([disabled]) {
     background-color: var(--focusBlue);
     color: white;
 }
@@ -109,4 +113,30 @@ body {
 #next-button:active {
     background-color: var(--focusPink);
     color: white;
+}
+
+.correct {
+    background: green;
+}
+
+.correct1 {
+    background: green;
+}
+
+.incorrect {
+    background: red;
+}
+
+.correct::after {
+    content: "correct!";
+    position: absolute;
+    left: 65%;
+    font-style: italic;
+}
+
+.incorrect::after {
+    content: "incorrect! 10s deducted";
+    position: absolute;
+    left: 55%;
+    font-style: italic;
 }

@@ -88,6 +88,121 @@ var questions = [
             {text: "a lightweight, 'write less, do more', JavaScript library", correct: true},
             {text: "a movement that pushes developers to code in vanilla JavaScript", correct: false},
         ]
-    },
-    
-]
+    },   
+
+];
+var questionElement = document.getElementById("question");
+        var answerButtonElement = document.getElementById("answer-buttons");
+        var nextButton = document.getElementById("next-button");
+        var scoreElement = document.getElementById("score");
+        var initialsContainer = document.getElementById("initials-container");
+        var initialsInput = document.getElementById("initials");
+        var saveButton = document.getElementById("save-button");
+
+        var currentQuestionIndex = 0;
+        var score = 0;
+        var timer;
+        var timeLeft = 60; // Set your desired initial time limit in seconds
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            timeLeft = 60;
+            nextButton.innerHTML = "Next";
+            showQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            timer = setInterval(function () {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            resetState();
+            var currentQuestion = questions[currentQuestionIndex];
+            var questionNumber = currentQuestionIndex + 1;
+            questionElement.innerHTML = questionNumber + ". " + currentQuestion.question;
+
+            currentQuestion.answers.forEach(answer => {
+                var button = document.createElement("button");
+                button.innerHTML = answer.text;
+                button.classList.add("button");
+                answerButtonElement.appendChild(button);
+                if (answer.correct) {
+                    button.dataset.correct = answer.correct;
+                }
+                button.addEventListener("click", selectAnswer);
+            });
+        }
+
+        function resetState() {
+            nextButton.style.display = "none";
+            while (answerButtonElement.firstChild) {
+                answerButtonElement.removeChild(answerButtonElement.firstChild);
+            }
+        }
+
+        function showScore() {
+            scoreElement.innerHTML = "Score: " + score + " /10";
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            questionElement.innerHTML = "Game Over!";
+            answerButtonElement.innerHTML = "";
+            nextButton.style.display = "none";
+            initialsContainer.style.display = "block";
+            showScore();
+        }
+
+        function saveScore() {
+            var initials = initialsInput.value.trim().toUpperCase();
+            if (initials !== "") {
+                // Save the score and initials (you can use localStorage, server-side storage, etc.)
+                alert("Score saved! Initials: " + initials + ", Score: " + score);
+            } else {
+                alert("Please enter your initials.");
+            }
+        }
+
+        function nextQuestion() {
+            clearInterval(timer);
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+                startTimer();
+            } else {
+                endGame();
+            }
+        }
+
+        function selectAnswer(e) {
+            var selectedButton = e.target;
+            var isCorrect = selectedButton.dataset.correct === "true";
+            if (isCorrect) {
+                selectedButton.classList.add("correct");
+                score++;
+                nextButton.style.display = "block";
+            } else {
+                selectedButton.classList.add("incorrect");
+                timeLeft -= 5; // Deduct 5 seconds for incorrect answers
+                nextButton.style.display = "block";
+            }
+            Array.from(answerButtonElement.children).forEach(button => {
+                if (button.dataset.correct === "true") {
+                    button.classList.add("correct1");
+                }
+                button.disabled = true;
+            });
+        }
+
+        saveButton.addEventListener("click", saveScore);
+        nextButton.addEventListener("click", nextQuestion);
+
+        startQuiz();
